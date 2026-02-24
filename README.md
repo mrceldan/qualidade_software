@@ -127,3 +127,74 @@ Este projeto demonstra:
 - Design de API RESTful
 - Integração com banco de dados NoSQL
 - Template frontend com Thymeleaf
+
+## Guia de Testes (Aula 02)
+
+Nesta etapa, focamos em garantir a qualidade do código através de testes automatizados, isolando a lógica de negócio e validando múltiplos cenários.
+
+### 1. Testes Unitários (Mocados)
+
+Testes unitários verificam a menor unidade de código (geralmente um método) em isolamento. Usamos o **Mockito** para "mocar" (simular) dependências, como repositórios ou serviços externos, garantindo que o teste foque apenas na lógica da classe testada.
+
+**Passo a passo para criar um teste mocando o Service:**
+
+1.  **Anotações:** Use `@ExtendWith(MockitoExtension.class)` na classe de teste.
+2.  **Mocks:** Use `@Mock` para as dependências que deseja simular.
+3.  **Injeção:** Use `@InjectMocks` na classe que será testada.
+4.  **Configuração (Given):** Defina o comportamento do mock usando `when(...).thenReturn(...)`.
+5.  **Ação (When):** Chame o método que está sendo testado.
+6.  **Verificação (Then):** Use `assertEquals(...)` ou `verify(...)` para validar o resultado.
+
+Exemplo conceitual:
+```java
+@ExtendWith(MockitoExtension.class)
+class StudentServiceTest {
+    @Mock
+    private StudentRepository repository;
+
+    @InjectMocks
+    private StudentService service;
+
+    @Test
+    void deveSalvarEstudanteComSucesso() {
+        Student student = new Student("João", "joao@email.com");
+        when(repository.save(any())).thenReturn(student);
+
+        Student salvo = service.save(student);
+
+        assertNotNull(salvo);
+        verify(repository, times(1)).save(student);
+    }
+}
+```
+
+### 2. Testes Parametrizados
+
+Testes parametrizados permitem executar o mesmo teste várias vezes com diferentes conjuntos de dados, evitando repetição de código.
+
+**Passo a passo:**
+
+1.  **Anotação:** Use `@ParameterizedTest` em vez de `@Test`.
+2.  **Fonte de Dados:** Use `@ValueSource`, `@CsvSource`, ou `@MethodSource` para prover os dados.
+3.  **Parâmetros:** O método de teste deve receber os parâmetros na mesma ordem da fonte.
+
+Exemplo com `@CsvSource`:
+```java
+@ParameterizedTest
+@CsvSource({
+    "João, joao@email.com, true",
+    " , erro@email.com, false",
+    "Maria, , false"
+})
+void validarDadosDoEstudante(String nome, String email, boolean esperado) {
+    boolean resultado = service.validar(nome, email);
+    assertEquals(esperado, resultado);
+}
+```
+
+### Executando os Testes
+
+Para rodar todos os testes do projeto:
+```bash
+mvn test
+```

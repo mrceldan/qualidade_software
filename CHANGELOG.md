@@ -1,86 +1,47 @@
-# Changelog
+# CHANGELOG
 
-## 2026-02-10 - Falha no `mvn clean install` por `MockMvc` ausente
+## [0.1.0] - 2026-02-24
 
-### O que aconteceu
-Ao executar:
+### Adicionado
+- Planejamento de Testes baseado na Aula 02.
+- Estrutura de documentação seguindo a IEEE 829.
+- Definição de Matriz de Rastreabilidade (RTM).
+- Critérios de Entrada, Saída e Suspensão para o ciclo de testes.
 
-```bash
-mvn clean install
-```
+---
 
-o build falhou na fase de testes com o erro:
+## Planejamento de Testes (Resumo Aula 02)
 
-```text
-No qualifying bean of type 'org.springframework.test.web.servlet.MockMvc' available
-```
+Esta seção resume os principais conceitos abordados na Aula 02 sobre Planejamento de Testes, com foco em sua importância, estrutura e ferramentas.
 
-Arquivo afetado:
-- `src/test/java/com/example/educationalqualityproject/controller/HomeControllerTest.java`
+### 1. Visão Geral do Planejamento de Testes
+*   **Definição:** Atividade que estabelece o que, como, quando, por quem e com quais critérios de aceite os testes serão realizados.
+*   **Importância:** Reduz incertezas, transforma requisitos abstratos em planos executáveis, alinha expectativas entre equipes (QA, Dev, Produto).
+*   **Plano de Teste:** Documento vivo que descreve escopo, abordagem, recursos, cronograma, responsabilidades, riscos e critérios para as atividades de teste.
+*   **Objetivos Principais:**
+    *   Garantir cobertura de requisitos críticos.
+    *   Reduzir riscos de negócio antes do release.
+    *   Dar previsibilidade para prazo e esforço de QA.
+    *   Permitir rastreabilidade ponta a ponta.
+*   **Hierarquia de Decomposição:** Requisito -> Use Case -> Test Case -> Dados de Teste.
 
-### Causa raiz (explicacao para alunos)
-No teste foi usada a anotacao `@AutoConfigureWebMvc`, mas ela **nao registra** o bean `MockMvc` para injecao no teste.
-Como o campo abaixo depende desse bean, a injecao falha:
+### 2. IEEE 829: Estrutura de Documentação de Testes
+*   **Padrão:** "Standard for Software and System Test Documentation", organiza a documentação de QA.
+*   **Artefatos Chave:**
+    *   **Test Plan:** Escopo, estratégia, ambiente, riscos, critérios, cronograma.
+    *   **Test Design Specification:** Técnicas de projeto, cobertura alvo.
+    *   **Test Case Specification:** ID, pré-condições, passos, dados, resultados esperados.
+    *   **Test Procedure:** Ordem de execução, script e instruções operacionais.
+    *   **Test Log / Incident Report:** Registro da execução, defeitos e evidências.
+    *   **Test Summary Report:** Status final, cobertura, riscos residuais e recomendação de release.
 
-```java
-@Autowired
-private MockMvc mockMvc;
-```
+### 3. Matriz de Rastreabilidade (RTM)
+*   **Propósito:** Tabela que conecta requisitos de negócio, casos de uso, casos de teste e defeitos.
+*   **Função:** Garante que todos os requisitos foram cobertos por testes, permite análise de impacto e gestão de mudanças.
 
-### Como corrigir (passo a passo)
-1. Abra o arquivo `src/test/java/com/example/educationalqualityproject/controller/HomeControllerTest.java`.
-2. Troque o import:
-
-```java
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
-```
-
-por:
-
-```java
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-```
-
-3. Troque a anotacao da classe:
-
-```java
-@AutoConfigureWebMvc
-```
-
-por:
-
-```java
-@AutoConfigureMockMvc
-```
-
-4. Salve o arquivo.
-5. Rode novamente:
-
-```bash
-mvn clean install
-```
-
-6. Verifique se os testes passam.
-
-### Exemplo final esperado do teste
-```java
-@SpringBootTest
-@AutoConfigureMockMvc
-class HomeControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Test
-    void shouldReturnHomeView() throws Exception {
-        mockMvc.perform(get("/"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("home"));
-    }
-}
-```
-
-### Nota didatica
-Resumo para memorizar:
-- `@AutoConfigureWebMvc` configura infraestrutura MVC.
-- `@AutoConfigureMockMvc` disponibiliza `MockMvc` para testes web.
+### 4. Critérios de Entrada, Saída e Suspensão
+*   **Definição:** "Portões" objetivos e pré-acordados que governam o início, a pausa e a conclusão da fase de testes.
+*   **Tipos:**
+    *   **Entrada (Entry Criteria):** Condições para iniciar os testes.
+    *   **Suspensão (Suspension Criteria):** Condições para pausar os testes.
+    *   **Saída (Exit Criteria):** Condições para concluir os testes.
